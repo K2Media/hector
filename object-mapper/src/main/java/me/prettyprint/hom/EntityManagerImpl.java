@@ -168,16 +168,20 @@ public class EntityManagerImpl {
   
   /**
    * Save the entity instance.
-   * 
+   *
    * @param <T>
    * @param obj
    * @return
    */
   public <T> T persist( T obj ) {
+        return persist(obj, null);
+    }
+
+  public <T> T persist( T obj, Integer ttl) {
     if (null == obj) {
       throw new IllegalArgumentException("object to save cannot be null");
     }
-    return objMapper.saveObj(keyspace, obj);
+    return objMapper.saveObj(keyspace, obj, ttl);
   }
 
   /**
@@ -190,8 +194,8 @@ public class EntityManagerImpl {
     if (null == objColl) {
       throw new IllegalArgumentException("object to save cannot be null");
     }
-    
-    objMapper.saveObjCollection(keyspace, objColl);
+
+    objMapper.saveObjCollection(keyspace, objColl, null);
     return objColl;
   }
 
@@ -206,7 +210,7 @@ public class EntityManagerImpl {
       throw new IllegalArgumentException("object to save cannot be null");
     }
     
-    objMapper.saveObjCollection(keyspace, objColl, m);
+    objMapper.saveObjCollection(keyspace, objColl, m, null);
     return objColl;
   }
 

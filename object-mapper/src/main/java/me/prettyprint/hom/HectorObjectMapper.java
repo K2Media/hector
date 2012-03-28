@@ -65,7 +65,11 @@ public class HectorObjectMapper {
     this.cacheMgr = cacheMgr;
   }
 
-  /**
+    public void setMaxNumColumns(int maxNumColumns) {
+        this.maxNumColumns = maxNumColumns;
+    }
+
+    /**
    * Retrieve columns from cassandra keyspace and column family, instantiate a
    * new object of required type, and then map them to the object's properties.
    * 
@@ -110,14 +114,15 @@ public class HectorObjectMapper {
    * 
    * @param keyspace
    * @param obj
+   * @param ttl
    * @return
    */
-  public <T> T saveObj(Keyspace keyspace, T obj) {
+  public <T> T saveObj(Keyspace keyspace, T obj, Integer ttl) {
     if (null == obj) {
       throw new IllegalArgumentException("object cannot be null");
     }
     Mutator<byte[]> m = HFactory.createMutator(keyspace, BytesArraySerializer.get());
-    saveObj(keyspace, m, obj);
+    saveObj(keyspace, m, obj, ttl);
     m.execute();
     return obj;
   }
@@ -130,16 +135,17 @@ public class HectorObjectMapper {
    * 
    * @param keyspace
    * @param objColl
+   * @param ttl
    * @return
    */
-  public Collection<?> saveObjCollection(Keyspace keyspace, Collection<?> objColl) {
+  public Collection<?> saveObjCollection(Keyspace keyspace, Collection<?> objColl, Integer ttl) {
     Mutator<byte[]> m = HFactory.createMutator(keyspace, BytesArraySerializer.get());
-    Collection<?> retColl = saveObjCollection(keyspace, objColl, m);
+    Collection<?> retColl = saveObjCollection(keyspace, objColl, m, ttl);
     m.execute();
     return retColl;
   }
 
-  public Collection<?> saveObjCollection(Keyspace keyspace, Collection<?> objColl, Mutator<byte[]> m) {
+  public Collection<?> saveObjCollection(Keyspace keyspace, Collection<?> objColl, Mutator<byte[]> m, Integer ttl) {
     if (null == objColl) {
       throw new IllegalArgumentException("object cannot be null");
     }
@@ -148,12 +154,12 @@ public class HectorObjectMapper {
     }
 
     for (Object obj : objColl) {
-      saveObj(keyspace, m, obj);
+      saveObj(keyspace, m, obj,ttl);
     }
     return objColl;
   }
 
-  private void saveObj(Keyspace keyspace, Mutator<byte[]> m, Object obj) {
+  private void saveObj(Keyspace keyspace, Mutator<byte[]> m, Object obj, Integer ttl) {
     if (null == obj) {
       throw new IllegalArgumentException("object cannot be null");
     }
@@ -182,6 +188,7 @@ public class HectorObjectMapper {
             "Column name cannot be null or empty - trying to persist to ColumnFamily, "
                 + colFamName);
       }
+      if (ttl != null) col.setTtl(ttl);
       m.addInsertion(colFamKey, colFamName, col);
     }
   }
