@@ -1,23 +1,6 @@
 package me.prettyprint.hom;
 
 
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.persistence.DiscriminatorType;
-import javax.persistence.Id;
-
 import me.prettyprint.cassandra.serializers.BytesArraySerializer;
 import me.prettyprint.cassandra.serializers.IntegerSerializer;
 import me.prettyprint.cassandra.serializers.SerializerTypeInferer;
@@ -26,17 +9,29 @@ import me.prettyprint.hector.api.Keyspace;
 import me.prettyprint.hector.api.Serializer;
 import me.prettyprint.hector.api.beans.ColumnSlice;
 import me.prettyprint.hector.api.beans.HColumn;
+import me.prettyprint.hector.api.beans.Row;
+import me.prettyprint.hector.api.beans.Rows;
 import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.mutation.Mutator;
+import me.prettyprint.hector.api.query.MultigetSliceQuery;
 import me.prettyprint.hector.api.query.QueryResult;
 import me.prettyprint.hector.api.query.SliceQuery;
 import me.prettyprint.hom.annotations.Column;
 import me.prettyprint.hom.cache.HectorObjectMapperException;
 import me.prettyprint.hom.converters.Converter;
 import me.prettyprint.hom.converters.DefaultConverter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Id;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Maps a slice of <code>HColumn<String, byte[]></code>s to an object's
@@ -44,10 +39,10 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * As mentioned above all column names must be <code>String</code>s - doesn't
  * really make sense to have other types when mapping to object properties.
- * 
+ *
  * @param <T>
  *          Type of object mapping to cassandra row
- * 
+ *
  * @author Todd Burruss
  */
 public class HectorObjectMapper {
@@ -72,9 +67,9 @@ public class HectorObjectMapper {
     /**
    * Retrieve columns from cassandra keyspace and column family, instantiate a
    * new object of required type, and then map them to the object's properties.
-   * 
+   *
    * @param <T>
-   * 
+   *
    * @param keyspace
    * @param colFamName
    * @param pkObj
@@ -110,8 +105,51 @@ public class HectorObjectMapper {
     return obj;
   }
 
+    public <T, I> Map<I, T> getObjects(Keyspace keyspace, String colFamName, Collection<I> pkObjs) {
+        if (null == pkObjs) {
+            throw new IllegalArgumentException("object ID cannot be null or empty");
+        }
+        if (pkObjs.isEmpty()) return new HashMap<I, T>();
+        final CFMappingDef<T> cfMapDef = cacheMgr.getCfMapDef(colFamName, true);
+
+        HashMap<ByteBuffer, I> pkBytesToOriginalPk = new HashMap<ByteBuffer, I>(pkObjs.size());
+        ArrayList<byte[]> queryPkBytes = new ArrayList<byte[]>(pkObjs.size());
+        for (I pkObj : pkObjs) {
+            byte[] byteKey = generateColumnFamilyKeyFromPkObj(cfMapDef, pkObj);
+            // if we didn't wrap this in a byte buffer, reference equality would be used
+            pkBytesToOriginalPk.put(ByteBuffer.wrap(byteKey), pkObj);
+            queryPkBytes.add(byteKey);
+        }
+
+        MultigetSliceQuery<byte[], String, byte[]> q = HFactory.createMultigetSliceQuery(keyspace,
+                BytesArraySerializer.get(), StringSerializer.get(), BytesArraySerializer.get());
+        q.setColumnFamily(colFamName);
+        q.setKeys(queryPkBytes);
+
+        // if no anonymous handler then use specific columns
+        if (cfMapDef.isColumnSliceRequired()) {
+            q.setColumnNames(cfMapDef.getSliceColumnNameArr());
+        } else {
+            q.setRange("", "", false, maxNumColumns);
+        }
+
+        QueryResult<Rows<byte[], String, byte[]>> result = q.execute();
+        if (null == result || null == result.get()) {
+            return null;
+        }
+        HashMap<I, T> resultMap = new HashMap<I, T>(result.get().getCount());
+        for (Row<byte[], String, byte[]> row : result.get()) {
+            T obj = createObject(cfMapDef, row.getKey(), row.getColumnSlice());
+            I originalPk = pkBytesToOriginalPk.get(ByteBuffer.wrap(row.getKey()));
+            if (obj != null && originalPk != null)
+                resultMap.put(originalPk, obj);
+        }
+        return resultMap;
+   }
+
+
   /**
-   * 
+   *
    * @param keyspace
    * @param obj
    * @param ttl
@@ -132,7 +170,7 @@ public class HectorObjectMapper {
    * client to partition large collections appropriately so not to cause timeout
    * or buffer overflow issues. The objects can be heterogenous (mapping to
    * multiple column families, etc.)
-   * 
+   *
    * @param keyspace
    * @param objColl
    * @param ttl
@@ -213,14 +251,14 @@ public class HectorObjectMapper {
   @SuppressWarnings("unchecked")
   private byte[] generateColumnFamilyKeyFromPkObj(CFMappingDef<?> cfMapDef, Object pkObj) {
     List<byte[]> segmentList = new ArrayList<byte[]>(cfMapDef.getKeyDef().getIdPropertyMap().size());
-    
-    if (cfMapDef.getKeyDef().isComplexKey()) {	
-      Map<String, PropertyDescriptor> propertyDescriptorMap = cfMapDef.getKeyDef().getPropertyDescriptorMap(); 	 
+
+    if (cfMapDef.getKeyDef().isComplexKey()) {
+      Map<String, PropertyDescriptor> propertyDescriptorMap = cfMapDef.getKeyDef().getPropertyDescriptorMap();
       for (String key : cfMapDef.getKeyDef().getIdPropertyMap().keySet()) {
     	  PropertyDescriptor pd = propertyDescriptorMap.get(key);
     	  segmentList.add(callMethodAndConvertToCassandraType(pkObj, pd.getReadMethod(),
     	            new DefaultConverter()));
-      }	 
+      }
     } else {
       PropertyMappingDefinition md = cfMapDef.getKeyDef().getIdPropertyMap().values().iterator()
                                              .next();
@@ -264,7 +302,7 @@ public class HectorObjectMapper {
    * {@link HectorExtraProperties}. If so call
    * {@link HectorExtraProperties#addExtraProperty(String, String)}, on the
    * object.
-   * 
+   *
    * @param id
    *          ID (row key) of the object we are retrieving from Cassandra
    * @param clazz
@@ -272,7 +310,7 @@ public class HectorObjectMapper {
    * @param slice
    *          column slice from Hector of type
    *          <code>ColumnSlice<String, byte[]></code>
-   * 
+   *
    * @return instantiated object if success, null if slice is empty,
    *         RuntimeException otherwise
    */
@@ -331,7 +369,7 @@ public class HectorObjectMapper {
   /**
    * Create Set of HColumns for the given Object. The Object must be annotated
    * with {@link Column} on the desired fields.
-   * 
+   *
    * @param obj
    * @return
    */
@@ -346,7 +384,7 @@ public class HectorObjectMapper {
 
   /**
    * Creates a Map of property names as key and HColumns as value. See #
-   * 
+   *
    * @param obj
    * @return
    */

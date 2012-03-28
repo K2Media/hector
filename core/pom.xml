@@ -8,7 +8,6 @@
   <artifactId>hector-core</artifactId>
   <packaging>bundle</packaging>
   <name>hector-core</name>
-  <version>1.0-4-snr</version>
   <properties>
     <!-- OSGi bundle properties -->
     <bundle.symbolicName>me.prettyprint.hector</bundle.symbolicName>

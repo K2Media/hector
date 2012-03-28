@@ -1,6 +1,7 @@
 package me.prettyprint.hom;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -131,7 +132,25 @@ public class EntityManagerImpl {
 
     return objMapper.<T, I>getObject(keyspace, cfMapDef.getEffectiveColFamName(), id);
   }
-  
+
+    public <T, I> Map<I, T> findMultiple(Class<T> clazz, Collection<I> ids) {
+      if (null == clazz) {
+        throw new IllegalArgumentException("clazz cannot be null");
+      }
+      if (null == ids) {
+        throw new IllegalArgumentException("id cannot be null");
+      }
+
+      CFMappingDef<T> cfMapDef = cacheMgr.getCfMapDef(clazz, false);
+      if (null == cfMapDef) {
+        throw new HectorObjectMapperException("No class annotated with @"
+            + Entity.class.getSimpleName() + " for type, " + clazz.getName());
+      }
+
+      return objMapper.<T, I>getObjects(keyspace, cfMapDef.getEffectiveColFamName(), ids);
+    }
+
+
   /**
    * Load an entity instance given the raw column slice. This is a stop gap
    * solution for instanting objects using entity manager while iterating over
