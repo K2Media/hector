@@ -201,7 +201,7 @@ public class EntityManagerImpl {
         }
         Map<I, T> result = new HashMap<I, T>(colSlices.size());
         for (Map.Entry<I, ColumnSlice<String, byte[]>> entry : colSlices.entrySet()) {
-            result.put(entry.getKey(), objMapper.createObject(cfMapDef, entry.getKey(), entry.getValue()))
+            result.put(entry.getKey(), objMapper.createObject(cfMapDef, entry.getKey(), entry.getValue()));
         }
         return result;
     }
