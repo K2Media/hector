@@ -1,6 +1,7 @@
 package me.prettyprint.hom;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -133,7 +134,7 @@ public class EntityManagerImpl {
     return objMapper.<T, I>getObject(keyspace, cfMapDef.getEffectiveColFamName(), id);
   }
 
-    public <T, I> Map<I, T> findMultiple(Class<T> clazz, Collection<I> ids) {
+    public <I, T> Map<I, T> findMultiple(Class<T> clazz, Collection<I> ids) {
       if (null == clazz) {
         throw new IllegalArgumentException("clazz cannot be null");
       }
@@ -147,7 +148,7 @@ public class EntityManagerImpl {
             + Entity.class.getSimpleName() + " for type, " + clazz.getName());
       }
 
-      return objMapper.<T, I>getObjects(keyspace, cfMapDef.getEffectiveColFamName(), ids);
+      return objMapper.<I, T>getObjects(keyspace, cfMapDef.getEffectiveColFamName(), ids);
     }
 
 
@@ -184,7 +185,27 @@ public class EntityManagerImpl {
     T obj = objMapper.createObject(cfMapDef, id, colSlice);
     return obj;
   }
-  
+
+    public <I, T> Map<I, T> findMultiple(Class<T> clazz, Map<I, ColumnSlice<String, byte[]>> colSlices) {
+        if (null == clazz) {
+            throw new IllegalArgumentException("clazz cannot be null");
+        }
+        if (null == colSlices) {
+            throw new IllegalArgumentException("colSlices cannot be null");
+        }
+
+        CFMappingDef<T> cfMapDef = cacheMgr.getCfMapDef(clazz, false);
+        if (null == cfMapDef) {
+            throw new HectorObjectMapperException("No class annotated with @"
+                    + Entity.class.getSimpleName() + " for type, " + clazz.getName());
+        }
+        Map<I, T> result = new HashMap<I, T>(colSlices.size());
+        for (Map.Entry<I, ColumnSlice<String, byte[]>> entry : colSlices.entrySet()) {
+            result.put(entry.getKey(), objMapper.createObject(cfMapDef, entry.getKey(), entry.getValue()))
+        }
+        return result;
+    }
+
   /**
    * Save the entity instance.
    *

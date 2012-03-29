@@ -105,7 +105,7 @@ public class HectorObjectMapper {
     return obj;
   }
 
-    public <T, I> Map<I, T> getObjects(Keyspace keyspace, String colFamName, Collection<I> pkObjs) {
+    public <I, T> Map<I, T> getObjects(Keyspace keyspace, String colFamName, Collection<I> pkObjs) {
         if (null == pkObjs) {
             throw new IllegalArgumentException("object ID cannot be null or empty");
         }
