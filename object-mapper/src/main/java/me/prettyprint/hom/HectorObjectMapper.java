@@ -139,8 +139,8 @@ public class HectorObjectMapper {
         }
         HashMap<I, T> resultMap = new HashMap<I, T>(result.get().getCount());
         for (Row<byte[], String, byte[]> row : result.get()) {
-            T obj = createObject(cfMapDef, row.getKey(), row.getColumnSlice());
             I originalPk = pkBytesToOriginalPk.get(ByteBuffer.wrap(row.getKey()));
+            T obj = createObject(cfMapDef, originalPk, row.getColumnSlice());
             if (obj != null && originalPk != null)
                 resultMap.put(originalPk, obj);
         }
