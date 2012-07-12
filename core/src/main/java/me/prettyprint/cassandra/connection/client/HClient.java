@@ -26,7 +26,7 @@ public interface HClient {
    * @throws IllegalStateException
    *           if it is called on a closed client
    */
-  Cassandra.Client getCassandra();
+  Cassandra.Iface getCassandra();
 
   /**
    * Returns a new Cassandra.Client on each invocation using the underlying
@@ -43,7 +43,7 @@ public interface HClient {
    * @throws HectorTransportException
    *           if any other error occurs
    */
-  Cassandra.Client getCassandra(String keyspaceNameArg);
+  Cassandra.Iface getCassandra(String keyspaceNameArg);
 
   /**
    * Close this client and its underlying connection.

@@ -7,6 +7,7 @@ import me.prettyprint.cassandra.model.ExecutionResult;
 import me.prettyprint.hector.api.ConsistencyLevelPolicy;
 import me.prettyprint.hector.api.exceptions.HectorException;
 
+import org.apache.cassandra.thrift.Cassandra;
 import org.apache.cassandra.thrift.Cassandra.Client;
 
 public class VirtualKeyspaceOperation<T> extends Operation<T> {
@@ -45,9 +46,9 @@ public class VirtualKeyspaceOperation<T> extends Operation<T> {
   }
 
   @Override
-  public void executeAndSetResult(Client cassandra, CassandraHost cassandraHost)
+  public void executeAndSetResult(Cassandra.Iface cassandra, CassandraHost cassandraHost)
       throws Exception {
-    operation.executeAndSetResult(new VirtualKeyspaceCassandraClient(cassandra, prefixBytes), cassandraHost);
+    operation.executeAndSetResult(new VirtualKeyspaceCassandraClient((Cassandra.Client)cassandra, prefixBytes), cassandraHost);
   }
 
   @Override
@@ -71,8 +72,8 @@ public class VirtualKeyspaceOperation<T> extends Operation<T> {
   }
 
   @Override
-  public T execute(Client cassandra) throws Exception {
-    return operation.execute(new VirtualKeyspaceCassandraClient(cassandra,
+  public T execute(Cassandra.Iface cassandra) throws Exception {
+    return operation.execute(new VirtualKeyspaceCassandraClient((Cassandra.Client)cassandra,
         prefixBytes));
   }
 

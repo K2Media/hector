@@ -87,7 +87,7 @@ public class ThriftColumnFamilyTemplate<K, N> extends ColumnFamilyTemplate<K, N>
       final HSlicePredicate<N> workingSlicePredicate) {
     return ((ExecutingKeyspace)keyspace).doExecuteOperation(new Operation<Map<ByteBuffer,List<ColumnOrSuperColumn>>>(OperationType.READ) {
       @Override
-      public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Client cassandra) throws HectorException {
+      public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Iface cassandra) throws HectorException {
         Map<ByteBuffer,List<ColumnOrSuperColumn>> cosc = new LinkedHashMap<ByteBuffer, List<ColumnOrSuperColumn>>();
         try {          
 
@@ -109,7 +109,7 @@ public class ThriftColumnFamilyTemplate<K, N> extends ColumnFamilyTemplate<K, N>
       final HSlicePredicate<N> workingSlicePredicate) {
     return ((ExecutingKeyspace)keyspace).doExecuteOperation(new Operation<Map<ByteBuffer,List<ColumnOrSuperColumn>>>(OperationType.READ) {
       @Override
-      public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Client cassandra) throws HectorException {
+      public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Iface cassandra) throws HectorException {
         try {          
           List<K> keyList = new ArrayList<K>();
           Iterators.addAll(keyList, keys.iterator());
@@ -128,7 +128,7 @@ public class ThriftColumnFamilyTemplate<K, N> extends ColumnFamilyTemplate<K, N>
       final HSlicePredicate<N> workingSlicePredicate) {
     return ((ExecutingKeyspace)keyspace).doExecuteOperation(new Operation<Map<ByteBuffer,List<ColumnOrSuperColumn>>>(OperationType.READ) {
       @Override
-      public Map<ByteBuffer, List<ColumnOrSuperColumn>> execute(Client cassandra) throws HectorException {
+      public Map<ByteBuffer, List<ColumnOrSuperColumn>> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           List<KeySlice> keySlices = cassandra.get_indexed_slices(
               columnParent,

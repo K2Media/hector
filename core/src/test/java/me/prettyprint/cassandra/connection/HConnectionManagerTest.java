@@ -13,7 +13,7 @@ import me.prettyprint.cassandra.service.OperationType;
 import me.prettyprint.hector.api.exceptions.HTimedOutException;
 import me.prettyprint.hector.api.exceptions.HectorException;
 
-import org.apache.cassandra.thrift.Cassandra.Client;
+import org.apache.cassandra.thrift.Cassandra;
 import org.junit.Test;
 
 public class HConnectionManagerTest extends BaseEmbededServerSetupTest {
@@ -88,7 +88,7 @@ public class HConnectionManagerTest extends BaseEmbededServerSetupTest {
     }
 
     @Override
-    public String execute(Client cassandra) throws HectorException {
+    public String execute(Cassandra.Iface cassandra) throws HectorException {
       throw new HTimedOutException("fake timeout");
     }
   }

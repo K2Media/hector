@@ -90,7 +90,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<Void> op = new Operation<Void>(OperationType.WRITE, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Void execute(Cassandra.Client cassandra) throws HectorException {
+      public Void execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           cassandra.batch_mutate(mutationMap, getThriftCl(OperationType.WRITE));
         } catch (Exception e) {
@@ -114,7 +114,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<Integer> op = new Operation<Integer>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Integer execute(Cassandra.Client cassandra) throws HectorException {
+      public Integer execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           return cassandra.get_count(key, columnParent, predicate, getThriftCl(OperationType.READ));
         } catch (Exception e) {
@@ -145,7 +145,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<Column>> execute(Cassandra.Client cassandra)
+      public Map<ByteBuffer, List<Column>> execute(Cassandra.Iface cassandra)
           throws HectorException {
         try {
           List<KeySlice> keySlices = cassandra.get_range_slices(columnParent,
@@ -176,7 +176,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<CounterColumn>> execute(Cassandra.Client cassandra)
+      public Map<ByteBuffer, List<CounterColumn>> execute(Cassandra.Iface cassandra)
           throws HectorException {
         try {
           List<KeySlice> keySlices = cassandra.get_range_slices(columnParent,
@@ -208,7 +208,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<SuperColumn>> execute(Cassandra.Client cassandra)
+      public Map<ByteBuffer, List<SuperColumn>> execute(Cassandra.Iface cassandra)
           throws HectorException {
         try {
           List<KeySlice> keySlices = cassandra.get_range_slices(columnParent,
@@ -239,7 +239,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<CounterSuperColumn>> execute(Cassandra.Client cassandra)
+      public Map<ByteBuffer, List<CounterSuperColumn>> execute(Cassandra.Iface cassandra)
           throws HectorException {
         try {
           List<KeySlice> keySlices = cassandra.get_range_slices(columnParent,
@@ -268,7 +268,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<List<Column>> op = new Operation<List<Column>>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public List<Column> execute(Cassandra.Client cassandra) throws HectorException {
+      public List<Column> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           List<ColumnOrSuperColumn> cosclist = cassandra.get_slice(key, columnParent,
               predicate, getThriftCl(OperationType.READ));
@@ -303,7 +303,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         new Operation<List<CounterColumn>>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public List<CounterColumn> execute(Cassandra.Client cassandra) throws HectorException {
+      public List<CounterColumn> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           List<ColumnOrSuperColumn> cosclist = cassandra.get_slice(key, columnParent,
               predicate, getThriftCl(OperationType.READ));
@@ -343,7 +343,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<SuperColumn> op = new Operation<SuperColumn>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public SuperColumn execute(Cassandra.Client cassandra) throws HectorException {
+      public SuperColumn execute(Cassandra.Iface cassandra) throws HectorException {
         ColumnOrSuperColumn cosc;
         try {
           cosc = cassandra.get(key, columnPath, getThriftCl(OperationType.READ));
@@ -381,7 +381,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         keyspaceName, credentials) {
 
       @Override
-      public SuperColumn execute(Cassandra.Client cassandra) throws HectorException {
+      public SuperColumn execute(Cassandra.Iface cassandra) throws HectorException {
         ColumnParent clp = new ColumnParent(columnPath.getColumn_family());
         clp.setSuper_column(columnPath.getSuper_column());
 
@@ -416,7 +416,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<List<SuperColumn>> op = new Operation<List<SuperColumn>>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public List<SuperColumn> execute(Cassandra.Client cassandra) throws HectorException {
+      public List<SuperColumn> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           List<ColumnOrSuperColumn> cosclist = cassandra.get_slice(key, columnParent,
               predicate, getThriftCl(OperationType.READ));
@@ -451,7 +451,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<List<CounterSuperColumn>> op = new Operation<List<CounterSuperColumn>>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public List<CounterSuperColumn> execute(Cassandra.Client cassandra) throws HectorException {
+      public List<CounterSuperColumn> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           List<ColumnOrSuperColumn> cosclist = cassandra.get_slice(key, columnParent,
               predicate, getThriftCl(OperationType.READ));
@@ -479,7 +479,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<Void> op = new Operation<Void>(OperationType.WRITE, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Void execute(Cassandra.Client cassandra) throws HectorException {
+      public Void execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           cassandra.insert(key, columnParent, column, getThriftCl(OperationType.WRITE));
           return null;
@@ -497,7 +497,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<Void> op = new Operation<Void>(OperationType.WRITE, failoverPolicy, keyspaceName, credentials) {
 
         @Override
-        public Void execute(Cassandra.Client cassandra) throws HectorException {
+        public Void execute(Cassandra.Iface cassandra) throws HectorException {
           try {
             cassandra.add(key, columnParent, counterColumn, getThriftCl(OperationType.WRITE));
             return null;
@@ -548,7 +548,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<Column>> execute(Cassandra.Client cassandra) throws HectorException {
+      public Map<ByteBuffer, List<Column>> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           Map<ByteBuffer, List<ColumnOrSuperColumn>> cfmap = cassandra.multiget_slice(
               keys, columnParent, predicate, getThriftCl(OperationType.READ));
@@ -575,7 +575,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<CounterColumn>> execute(Cassandra.Client cassandra) throws HectorException {
+      public Map<ByteBuffer, List<CounterColumn>> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           Map<ByteBuffer, List<ColumnOrSuperColumn>> cfmap = cassandra.multiget_slice(
               keys, columnParent, predicate, getThriftCl(OperationType.READ));
@@ -640,7 +640,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<SuperColumn>> execute(Cassandra.Client cassandra)
+      public Map<ByteBuffer, List<SuperColumn>> execute(Cassandra.Iface cassandra)
           throws HectorException {
         try {
           Map<ByteBuffer, List<ColumnOrSuperColumn>> cfmap = cassandra.multiget_slice(
@@ -682,7 +682,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<CounterSuperColumn>> execute(Cassandra.Client cassandra)
+      public Map<ByteBuffer, List<CounterSuperColumn>> execute(Cassandra.Iface cassandra)
           throws HectorException {
         try {
           Map<ByteBuffer, List<ColumnOrSuperColumn>> cfmap = cassandra.multiget_slice(
@@ -726,7 +726,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
         OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, List<Column>> execute(Cassandra.Client cassandra)
+      public Map<ByteBuffer, List<Column>> execute(Cassandra.Iface cassandra)
           throws HectorException {
         try {
           List<KeySlice> keySlices = cassandra.get_indexed_slices(columnParent, indexClause,
@@ -760,7 +760,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<Map<ByteBuffer,Integer>> op = new Operation<Map<ByteBuffer,Integer>>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Map<ByteBuffer, Integer> execute(Cassandra.Client cassandra) throws HectorException {
+      public Map<ByteBuffer, Integer> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           return cassandra.multiget_count(keys, columnParent, slicePredicate,
               getThriftCl(OperationType.READ));
@@ -779,7 +779,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<Void> op = new Operation<Void>(OperationType.WRITE, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Void execute(Cassandra.Client cassandra) throws HectorException {
+      public Void execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           cassandra.remove(key, columnPath, timestamp, getThriftCl(OperationType.WRITE));
           return null;
@@ -796,7 +796,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<Void> op = new Operation<Void>(OperationType.WRITE, failoverPolicy, keyspaceName, credentials) {
 
         @Override
-        public Void execute(Cassandra.Client cassandra) throws HectorException {
+        public Void execute(Cassandra.Iface cassandra) throws HectorException {
           try {
             cassandra.remove_counter(key, columnPath, getThriftCl(OperationType.WRITE));
             return null;
@@ -840,7 +840,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<Column> op = new Operation<Column>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
       @Override
-      public Column execute(Cassandra.Client cassandra) throws HectorException {
+      public Column execute(Cassandra.Iface cassandra) throws HectorException {
         ColumnOrSuperColumn cosc;
         try {
           cosc = cassandra.get(key, columnPath, getThriftCl(OperationType.READ));
@@ -866,7 +866,7 @@ public class KeyspaceServiceImpl implements KeyspaceService {
     Operation<CounterColumn> op = new Operation<CounterColumn>(OperationType.READ, failoverPolicy, keyspaceName, credentials) {
 
         @Override
-        public CounterColumn execute(Cassandra.Client cassandra) throws HectorException {
+        public CounterColumn execute(Cassandra.Iface cassandra) throws HectorException {
           ColumnOrSuperColumn cosc;
           try {
             cosc = cassandra.get(key, columnPath, getThriftCl(OperationType.READ));

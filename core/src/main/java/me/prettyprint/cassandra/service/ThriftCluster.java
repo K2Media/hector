@@ -24,7 +24,7 @@ public class ThriftCluster extends AbstractCluster implements Cluster {
   public List<TokenRange> describeRing(final String keyspace) throws HectorException {
     Operation<List<TokenRange>> op = new Operation<List<TokenRange>>(OperationType.META_READ, getCredentials()) {
       @Override
-      public List<TokenRange> execute(Cassandra.Client cassandra) throws HectorException {
+      public List<TokenRange> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           return cassandra.describe_ring(keyspace);
         } catch (Exception e) {
@@ -39,7 +39,7 @@ public class ThriftCluster extends AbstractCluster implements Cluster {
   public Map<String,List<String>> describeSchemaVersions() throws HectorException {
     Operation<Map<String,List<String>>> op = new Operation<Map<String,List<String>>>(OperationType.META_READ, getCredentials()) {
       @Override
-      public Map<String,List<String>> execute(Cassandra.Client cassandra) throws HectorException {
+      public Map<String,List<String>> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           return cassandra.describe_schema_versions();
         } catch (Exception e) {
@@ -60,7 +60,7 @@ public class ThriftCluster extends AbstractCluster implements Cluster {
   public String updateKeyspace(final KeyspaceDefinition ksdef, final boolean waitForSchemaAgreement) throws HectorException {
     Operation<String> op = new Operation<String>(OperationType.META_WRITE, FailoverPolicy.FAIL_FAST, getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           if (waitForSchemaAgreement) {
             waitForSchemaAgreement(cassandra);
@@ -91,7 +91,7 @@ public class ThriftCluster extends AbstractCluster implements Cluster {
         cfdef.getKeyspaceName(), 
         getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           if (waitForSchemaAgreement) {
             waitForSchemaAgreement(cassandra);
@@ -122,7 +122,7 @@ public class ThriftCluster extends AbstractCluster implements Cluster {
         cfdef.getKeyspaceName(), 
         getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           if (waitForSchemaAgreement) {
             waitForSchemaAgreement(cassandra);
@@ -150,7 +150,7 @@ public class ThriftCluster extends AbstractCluster implements Cluster {
   public String addKeyspace(final KeyspaceDefinition ksdef, final boolean waitForSchemaAgreement) throws HectorException {
     Operation<String> op = new Operation<String>(OperationType.META_WRITE, FailoverPolicy.FAIL_FAST, getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           if (waitForSchemaAgreement) {
             waitForSchemaAgreement(cassandra);

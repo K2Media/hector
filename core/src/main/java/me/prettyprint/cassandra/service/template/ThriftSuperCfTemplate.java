@@ -48,7 +48,7 @@ public class ThriftSuperCfTemplate<K, SN, N> extends SuperCfTemplate<K, SN, N> {
       final HSlicePredicate<SN> workingSlicePredicate) {
     return ((ExecutingKeyspace)keyspace).doExecuteOperation(new Operation<Map<ByteBuffer,List<ColumnOrSuperColumn>>>(OperationType.READ) {
       @Override
-      public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Client cassandra) throws HectorException {
+      public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Iface cassandra) throws HectorException {
         Map<ByteBuffer,List<ColumnOrSuperColumn>> cosc = new LinkedHashMap<ByteBuffer, List<ColumnOrSuperColumn>>();
         try {          
 
@@ -71,7 +71,7 @@ public class ThriftSuperCfTemplate<K, SN, N> extends SuperCfTemplate<K, SN, N> {
       final HSlicePredicate<SN> workingSlicePredicate) {
     return ((ExecutingKeyspace)keyspace).doExecuteOperation(new Operation<Map<ByteBuffer,List<ColumnOrSuperColumn>>>(OperationType.READ) {
       @Override
-      public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Client cassandra) throws HectorException {
+      public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Iface cassandra) throws HectorException {
         Map<ByteBuffer,List<ColumnOrSuperColumn>> cosc;
         try {          
 

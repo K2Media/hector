@@ -130,7 +130,7 @@ public abstract class AbstractCluster implements Cluster {
   public List<KeyspaceDefinition> describeKeyspaces() throws HectorException {
     Operation<List<KeyspaceDefinition>> op = new Operation<List<KeyspaceDefinition>>(OperationType.META_READ, getCredentials()) {
       @Override
-      public List<KeyspaceDefinition> execute(Cassandra.Client cassandra) throws HectorException {
+      public List<KeyspaceDefinition> execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           return ThriftKsDef.fromThriftList(cassandra.describe_keyspaces());
         } catch (Exception e) {
@@ -149,7 +149,7 @@ public abstract class AbstractCluster implements Cluster {
   public String describeClusterName() throws HectorException {
     Operation<String> op = new Operation<String>(OperationType.META_READ, getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           return cassandra.describe_cluster_name();
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public abstract class AbstractCluster implements Cluster {
   public String describeThriftVersion() throws HectorException {
     Operation<String> op = new Operation<String>(OperationType.META_READ, getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           return cassandra.describe_version();
         } catch (Exception e) {
@@ -189,7 +189,7 @@ public abstract class AbstractCluster implements Cluster {
     Operation<KeyspaceDefinition> op = new Operation<KeyspaceDefinition>(
         OperationType.META_READ, getCredentials()) {
       @Override
-      public KeyspaceDefinition execute(Cassandra.Client cassandra)
+      public KeyspaceDefinition execute(Cassandra.Iface cassandra)
       throws HectorException {
         try {
           return new ThriftKsDef(cassandra.describe_keyspace(keyspace));
@@ -222,7 +222,7 @@ public abstract class AbstractCluster implements Cluster {
   public String dropKeyspace(final String keyspace, final boolean waitForSchemaAgreement) throws HectorException {
     Operation<String> op = new Operation<String>(OperationType.META_WRITE, FailoverPolicy.FAIL_FAST, getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           if (waitForSchemaAgreement) {
             waitForSchemaAgreement(cassandra);
@@ -245,7 +245,7 @@ public abstract class AbstractCluster implements Cluster {
   public String describePartitioner() throws HectorException {
     Operation<String> op = new Operation<String>(OperationType.META_READ, getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           if ( log.isInfoEnabled() ) {
             log.info("in execute with client {}", cassandra);
@@ -270,7 +270,7 @@ public abstract class AbstractCluster implements Cluster {
   public String dropColumnFamily(final String keyspaceName, final String columnFamily,  final boolean waitForSchemaAgreement) throws HectorException {
     Operation<String> op = new Operation<String>(OperationType.META_WRITE, FailoverPolicy.FAIL_FAST, keyspaceName, getCredentials()) {
       @Override
-      public String execute(Cassandra.Client cassandra) throws HectorException {
+      public String execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           if (waitForSchemaAgreement) {
             waitForSchemaAgreement(cassandra);
@@ -299,7 +299,7 @@ public abstract class AbstractCluster implements Cluster {
   public void truncate(final String keyspaceName, final String columnFamily) throws HectorException {
     Operation<Void> op = new Operation<Void>(OperationType.META_WRITE, FailoverPolicy.FAIL_FAST, keyspaceName, getCredentials()) {
       @Override
-      public Void execute(Cassandra.Client cassandra) throws HectorException {
+      public Void execute(Cassandra.Iface cassandra) throws HectorException {
         try {
           cassandra.truncate(columnFamily);
         } catch (Exception e) {
@@ -320,7 +320,7 @@ public abstract class AbstractCluster implements Cluster {
     return configurator;
   }
 
-  protected static void waitForSchemaAgreement(Cassandra.Client cassandra) throws InvalidRequestException, TException, InterruptedException {
+  protected static void waitForSchemaAgreement(Cassandra.Iface cassandra) throws InvalidRequestException, TException, InterruptedException {
     int waited = 0;
     int versions = 0;
     while (versions != 1) {

@@ -242,7 +242,7 @@ public final class MutatorImpl<K> implements Mutator<K> {
     pendingMutations = null;
     return new MutationResultImpl(keyspace.doExecuteOperation(new Operation<Void>(OperationType.WRITE) {
       @Override
-      public Void execute(Cassandra.Client cassandra) throws Exception {
+      public Void execute(Cassandra.Iface cassandra) throws Exception {
         cassandra.batch_mutate(mutations.getMutationMap(),
           ThriftConverter.consistencyLevel(consistencyLevelPolicy.get(operationType)));
         return null;

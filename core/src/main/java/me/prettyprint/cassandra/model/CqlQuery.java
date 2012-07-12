@@ -14,10 +14,7 @@ import me.prettyprint.hector.api.Serializer;
 import me.prettyprint.hector.api.exceptions.HectorException;
 import me.prettyprint.hector.api.query.QueryResult;
 
-import org.apache.cassandra.thrift.Column;
-import org.apache.cassandra.thrift.Compression;
-import org.apache.cassandra.thrift.CqlResult;
-import org.apache.cassandra.thrift.CqlRow;
+import org.apache.cassandra.thrift.*;
 import org.apache.cassandra.thrift.Cassandra.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +97,7 @@ public class CqlQuery<K, N, V> extends AbstractBasicQuery<K, N, CqlRows<K,N,V>> 
         keyspace.doExecuteOperation(new Operation<CqlRows<K, N, V>>(OperationType.READ) {
 
           @Override
-          public CqlRows<K, N, V> execute(Client cassandra) throws HectorException {
+          public CqlRows<K, N, V> execute(Cassandra.Iface cassandra) throws HectorException {
             CqlRows<K, N, V> rows = null;
             try {
               CqlResult result = cassandra.execute_cql_query(query, 

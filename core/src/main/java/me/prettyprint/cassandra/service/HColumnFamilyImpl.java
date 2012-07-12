@@ -296,7 +296,7 @@ public class HColumnFamilyImpl<K,N> implements HColumnFamily<K, N> {
   private void doExecuteSlice() {
     keyspace.doExecuteOperation(new Operation<Column>(OperationType.READ) {
       @Override
-      public Column execute(Cassandra.Client cassandra) throws HectorException {
+      public Column execute(Cassandra.Iface cassandra) throws HectorException {
         
         try {          
           if ( queryLogger.isDebugEnabled() ) {
@@ -326,7 +326,7 @@ public class HColumnFamilyImpl<K,N> implements HColumnFamily<K, N> {
   private void doExecuteMultigetSlice() {
     keyspace.doExecuteOperation(new Operation<Column>(OperationType.READ) {
       @Override
-      public Column execute(Cassandra.Client cassandra) throws HectorException {
+      public Column execute(Cassandra.Iface cassandra) throws HectorException {
         try {          
           if ( queryLogger.isDebugEnabled() ) {
             queryLogger.debug("---------\nColumnFamily multiget: {} slicePredicate: {}", columnFamilyName, activeSlicePredicate.toString());

@@ -95,9 +95,9 @@ public abstract class Operation<T> {
   /**
    * Performs the operation on the given cassandra instance.
    */
-  public abstract T execute(Cassandra.Client cassandra) throws Exception;
+  public abstract T execute(Cassandra.Iface cassandra) throws Exception;
 
-  public void executeAndSetResult(Cassandra.Client cassandra, CassandraHost cassandraHost) throws Exception {
+  public void executeAndSetResult(Cassandra.Iface cassandra, CassandraHost cassandraHost) throws Exception {
     this.cassandraHost = cassandraHost;
     long startTime = System.nanoTime();
     setResult(execute(cassandra));

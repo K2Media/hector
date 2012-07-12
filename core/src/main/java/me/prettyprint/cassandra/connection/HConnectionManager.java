@@ -251,7 +251,7 @@ public class HConnectionManager {
         // TODO how to 'timeout' on this op when underlying pool is exhausted
         pool = getClientFromLBPolicy(excludeHosts);
         client = pool.borrowClient();
-        Cassandra.Client c = client.getCassandra(op.keyspaceName);
+        Cassandra.Iface c = client.getCassandra(op.keyspaceName);
         // Keyspace can be null for some system_* api calls
         if ( op.credentials != null && !op.credentials.isEmpty() && !client.isAlreadyAuthenticated(op.credentials)) {
           c.login(new AuthenticationRequest(op.credentials));
