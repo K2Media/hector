@@ -51,8 +51,11 @@ public class HConnectionManager {
   private ConnectionManagerListenersHandler listenerHandler = new ConnectionManagerListenersHandler();
 
   public HConnectionManager(String clusterName, CassandraHostConfigurator cassandraHostConfigurator) {
+      this(clusterName, cassandraHostConfigurator, HClientFactoryProvider.createFactory(cassandraHostConfigurator));
+  }
 
-    clientFactory = HClientFactoryProvider.createFactory(cassandraHostConfigurator);
+  public HConnectionManager(String clusterName, CassandraHostConfigurator cassandraHostConfigurator, HClientFactory clientFactory) {
+    this.clientFactory = clientFactory;
 
     loadBalancingPolicy = cassandraHostConfigurator.getLoadBalancingPolicy();
     clock = cassandraHostConfigurator.getClockResolution();

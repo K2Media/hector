@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import me.prettyprint.cassandra.connection.HConnectionManager;
+import me.prettyprint.cassandra.connection.factory.HClientFactory;
 import me.prettyprint.hector.api.ClockResolution;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
@@ -64,7 +65,11 @@ public abstract class AbstractCluster implements Cluster {
   }
 
   public AbstractCluster(String clusterName, CassandraHostConfigurator cassandraHostConfigurator, Map<String, String> credentials) {
-    connectionManager = new HConnectionManager(clusterName, cassandraHostConfigurator);
+    this(clusterName, cassandraHostConfigurator, credentials, null);
+  }
+
+  public AbstractCluster(String clusterName, CassandraHostConfigurator cassandraHostConfigurator, Map<String, String> credentials, HClientFactory clientFactory) {
+    connectionManager = new HConnectionManager(clusterName, cassandraHostConfigurator, clientFactory);
     name = clusterName;
     configurator = cassandraHostConfigurator;
     failoverPolicy = FailoverPolicy.ON_FAIL_TRY_ALL_AVAILABLE;
